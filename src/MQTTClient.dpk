@@ -1,0 +1,50 @@
+package MQTTClient;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  fmx,
+  IndySystem,
+  IndyProtocols,
+  IndyCore;
+
+contains
+  MQTTHeaders in 'MQTTHeaders.pas',
+  MQTTReadThread in 'MQTTReadThread.pas',
+  uMQTT in 'uMQTT.pas',
+  uMQTTComps in 'uMQTTComps.pas',
+  uMQTTMessage in 'uMQTTMessage.pas',
+  uMQTTPacket in 'uMQTTPacket.pas',
+  uMQTTSession in 'uMQTTSession.pas',
+  uMQTTSessionStore in 'uMQTTSessionStore.pas',
+  uMQTTPacketStore in 'uMQTTPacketStore.pas',
+  uMQTTMessageStore in 'uMQTTMessageStore.pas',
+  uMQTTSubscription in 'uMQTTSubscription.pas';
+
+end.

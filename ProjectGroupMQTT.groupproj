@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{F2216CC4-CD84-4DF2-8DC4-BFD6385F9E27}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="src\MQTTClient.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="sample\Fmx\MqttFmx.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="MQTTClient">
+        <MSBuild Projects="src\MQTTClient.dproj"/>
+    </Target>
+    <Target Name="MQTTClient:Clean">
+        <MSBuild Projects="src\MQTTClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MQTTClient:Make">
+        <MSBuild Projects="src\MQTTClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MqttFmx">
+        <MSBuild Projects="sample\Fmx\MqttFmx.dproj"/>
+    </Target>
+    <Target Name="MqttFmx:Clean">
+        <MSBuild Projects="sample\Fmx\MqttFmx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MqttFmx:Make">
+        <MSBuild Projects="sample\Fmx\MqttFmx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="MQTTClient;MqttFmx"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="MQTTClient:Clean;MqttFmx:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="MQTTClient:Make;MqttFmx:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

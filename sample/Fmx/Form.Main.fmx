@@ -1,0 +1,460 @@
+object FrmMain: TFrmMain
+  Left = 0
+  Top = 0
+  Caption = 'Form'
+  ClientHeight = 634
+  ClientWidth = 366
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object VsbBackground: TVertScrollBox
+    Align = Client
+    Size.Width = 366.000000000000000000
+    Size.Height = 634.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Viewport.Width = 350.000000000000000000
+    Viewport.Height = 634.000000000000000000
+    object LayBackground: TLayout
+      Align = Top
+      Size.Width = 350.000000000000000000
+      Size.Height = 945.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object LayConfig: TLayout
+        Align = Client
+        Size.Width = 350.000000000000000000
+        Size.Height = 945.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object RecConfigConnection: TRectangle
+          Align = Top
+          Size.Width = 350.000000000000000000
+          Size.Height = 281.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claGray
+          object LayHost: TLayout
+            Align = Top
+            Margins.Top = 6.000000000000000000
+            Position.Y = 6.000000000000000000
+            Size.Width = 350.000000000000000000
+            Size.Height = 41.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            object EdtHost: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Top
+              TabOrder = 0
+              Position.X = 6.000000000000000000
+              Position.Y = 17.000000000000000000
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 22.000000000000000000
+              Size.PlatformDefault = False
+            end
+            object LbHost: TLabel
+              Align = Top
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Position.X = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Host'
+              TabOrder = 1
+            end
+          end
+          object Layout1: TLayout
+            Align = Top
+            Margins.Top = 6.000000000000000000
+            Position.Y = 53.000000000000000000
+            Size.Width = 350.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            object EdtUser: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Top
+              TabOrder = 0
+              Position.X = 6.000000000000000000
+              Position.Y = 17.000000000000000000
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 22.000000000000000000
+              Size.PlatformDefault = False
+            end
+            object LbUser: TLabel
+              Align = Top
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Position.X = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'User'
+              TabOrder = 1
+            end
+          end
+          object Layout2: TLayout
+            Align = Top
+            Margins.Top = 6.000000000000000000
+            Position.Y = 99.000000000000000000
+            Size.Width = 350.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            object EdtPort: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Top
+              TabOrder = 0
+              Position.X = 6.000000000000000000
+              Position.Y = 17.000000000000000000
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 22.000000000000000000
+              Size.PlatformDefault = False
+            end
+            object LbPort: TLabel
+              Align = Top
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Position.X = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Port'
+              TabOrder = 1
+            end
+          end
+          object Layout3: TLayout
+            Align = Top
+            Margins.Top = 6.000000000000000000
+            Position.Y = 145.000000000000000000
+            Size.Width = 350.000000000000000000
+            Size.Height = 46.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 3
+            object EdtPassword: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Top
+              TabOrder = 0
+              Position.X = 6.000000000000000000
+              Position.Y = 17.000000000000000000
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 22.000000000000000000
+              Size.PlatformDefault = False
+            end
+            object LbPassword: TLabel
+              Align = Top
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Position.X = 6.000000000000000000
+              Size.Width = 338.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Password'
+              TabOrder = 1
+            end
+          end
+          object Layout4: TLayout
+            Align = Scale
+            Margins.Top = 6.000000000000000000
+            Position.Y = 193.722000122070300000
+            Size.Width = 349.998992919921900000
+            Size.Height = 68.622421264648440000
+            Size.PlatformDefault = False
+            TabOrder = 4
+            object LbStatus: TLabel
+              Align = Top
+              Margins.Left = 6.000000000000000000
+              Margins.Right = 6.000000000000000000
+              Position.X = 6.000000000000000000
+              Size.Width = 337.998992919921900000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Disconnected'
+              TabOrder = 0
+            end
+            object BtnConnect: TButton
+              Align = Scale
+              Position.X = 171.000000000000000000
+              Position.Y = 35.000000000000000000
+              Size.Width = 94.000000000000000000
+              Size.Height = 26.000000000000000000
+              Size.PlatformDefault = False
+              TabOrder = 1
+              Text = 'Connect'
+              OnClick = BtnConnectClick
+            end
+            object BtnDisconnect: TButton
+              Align = Scale
+              Position.X = 56.565567016601560000
+              Position.Y = 33.128067016601560000
+              Size.Width = 94.275955200195310000
+              Size.Height = 26.029190063476560000
+              Size.PlatformDefault = False
+              TabOrder = 2
+              Text = 'Disconnect'
+              OnClick = BtnDisconnectClick
+            end
+          end
+        end
+        object RecTopic: TRectangle
+          Align = Top
+          Position.Y = 281.000000000000000000
+          Size.Width = 350.000000000000000000
+          Size.Height = 144.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claGray
+          object LbTopic: TLabel
+            Align = Top
+            Margins.Left = 6.000000000000000000
+            Margins.Top = 6.000000000000000000
+            Margins.Right = 6.000000000000000000
+            Position.X = 6.000000000000000000
+            Position.Y = 6.000000000000000000
+            Size.Width = 338.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Topic'
+            TabOrder = 0
+          end
+          object BtnSubscriber: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 259.000000000000000000
+            Position.Y = 98.000000000000000000
+            TabOrder = 1
+            Text = 'Subscriber'
+            OnClick = BtnSubscriberClick
+          end
+          object BtnUnsubscriber: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 171.000000000000000000
+            Position.Y = 106.000000000000000000
+            TabOrder = 2
+            Text = 'Unsubscriber'
+            OnClick = BtnUnsubscriberClick
+          end
+          object EdtTopic: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Top
+            TabOrder = 3
+            Text = 'Frutas'
+            Position.X = 6.000000000000000000
+            Position.Y = 23.000000000000000000
+            Margins.Left = 6.000000000000000000
+            Margins.Right = 6.000000000000000000
+            Size.Width = 338.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+          end
+          object LbQos: TLabel
+            Align = Top
+            Margins.Left = 6.000000000000000000
+            Margins.Top = 6.000000000000000000
+            Margins.Right = 6.000000000000000000
+            Position.X = 6.000000000000000000
+            Position.Y = 51.000000000000000000
+            Size.Width = 338.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'QoS'
+            TabOrder = 4
+          end
+          object CbQos: TComboBox
+            Align = Top
+            Items.Strings = (
+              'At Most Once'
+              'At Least Once '
+              'Exactly Once')
+            ItemIndex = 0
+            Position.Y = 68.000000000000000000
+            Size.Width = 350.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 5
+          end
+        end
+        object RecMessage: TRectangle
+          Align = Top
+          Position.Y = 425.000000000000000000
+          Size.Width = 350.000000000000000000
+          Size.Height = 218.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claGray
+          object LbMessage: TLabel
+            Align = Top
+            Margins.Left = 6.000000000000000000
+            Margins.Top = 6.000000000000000000
+            Margins.Right = 6.000000000000000000
+            Position.X = 6.000000000000000000
+            Position.Y = 51.000000000000000000
+            Size.Width = 338.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Message'
+            TabOrder = 0
+          end
+          object MemMessage: TMemo
+            Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+            DataDetectorTypes = []
+            Align = Top
+            Margins.Left = 6.000000000000000000
+            Margins.Right = 6.000000000000000000
+            Position.X = 6.000000000000000000
+            Position.Y = 68.000000000000000000
+            Size.Width = 338.000000000000000000
+            Size.Height = 93.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Viewport.Width = 334.000000000000000000
+            Viewport.Height = 89.000000000000000000
+          end
+          object BtnInfo: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 183.000000000000000000
+            Position.Y = 176.000000000000000000
+            Size.Width = 72.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            Text = 'Info'
+            OnClick = BtnInfoClick
+          end
+          object BtnPublish: TButton
+            Anchors = [akTop, akRight]
+            Position.X = 263.000000000000000000
+            Position.Y = 176.000000000000000000
+            TabOrder = 3
+            Text = 'Publish'
+            OnClick = BtnPublishClick
+          end
+          object ChkRetain: TCheckBox
+            Position.X = 9.000000000000000000
+            Position.Y = 176.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 4
+            Text = 'Retain'
+          end
+          object LbTopicMsg: TLabel
+            Align = Top
+            Margins.Left = 6.000000000000000000
+            Margins.Top = 6.000000000000000000
+            Margins.Right = 6.000000000000000000
+            Position.X = 6.000000000000000000
+            Position.Y = 6.000000000000000000
+            Size.Width = 338.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Topic'
+            TabOrder = 5
+          end
+          object EdtTopicMsg: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Top
+            TabOrder = 6
+            Text = 'Frutas'
+            Position.Y = 23.000000000000000000
+            Size.Width = 350.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+          end
+        end
+        object RecResponse: TRectangle
+          Align = Top
+          Position.Y = 643.000000000000000000
+          Size.Width = 350.000000000000000000
+          Size.Height = 150.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claGray
+          object MemResponse: TMemo
+            Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+            DataDetectorTypes = []
+            Align = Top
+            Margins.Left = 8.000000000000000000
+            Margins.Top = 8.000000000000000000
+            Margins.Right = 8.000000000000000000
+            Margins.Bottom = 8.000000000000000000
+            Position.X = 8.000000000000000000
+            Position.Y = 25.000000000000000000
+            Size.Width = 334.000000000000000000
+            Size.Height = 112.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            Viewport.Width = 330.000000000000000000
+            Viewport.Height = 108.000000000000000000
+          end
+          object LbResponse: TLabel
+            Align = Top
+            Margins.Left = 8.000000000000000000
+            Margins.Right = 8.000000000000000000
+            Position.X = 8.000000000000000000
+            Size.Width = 334.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Response'
+            TabOrder = 1
+          end
+        end
+        object Rectangle1: TRectangle
+          Align = Top
+          Position.Y = 793.000000000000000000
+          Size.Width = 350.000000000000000000
+          Size.Height = 150.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claGray
+          object MemInfo: TMemo
+            Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+            DataDetectorTypes = []
+            Align = Top
+            Margins.Left = 8.000000000000000000
+            Margins.Top = 8.000000000000000000
+            Margins.Right = 8.000000000000000000
+            Margins.Bottom = 8.000000000000000000
+            Position.X = 8.000000000000000000
+            Position.Y = 25.000000000000000000
+            Size.Width = 334.000000000000000000
+            Size.Height = 112.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            Viewport.Width = 330.000000000000000000
+            Viewport.Height = 108.000000000000000000
+          end
+          object LbInfo: TLabel
+            Align = Top
+            Margins.Left = 8.000000000000000000
+            Margins.Right = 8.000000000000000000
+            Position.X = 8.000000000000000000
+            Size.Width = 334.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Information'
+            TabOrder = 1
+          end
+        end
+      end
+    end
+  end
+  object MQTTClient1: TMQTTClient
+    KeepAlive = 30
+    MaxRetries = 8
+    RetryTime = 60
+    Clean = False
+    AutoSubscribe = False
+    Port = 1883
+    LocalBounce = False
+    OnClientID = MQTTClient1ClientID
+    OnMon = MQTTClient1Mon
+    Left = 176
+    Top = 40
+  end
+end
