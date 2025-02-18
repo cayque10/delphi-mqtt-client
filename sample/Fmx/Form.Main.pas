@@ -13,7 +13,7 @@ uses
   FMX.Forms,
   FMX.Graphics,
   FMX.Dialogs,
-  uMQTTComps,
+  MQTT.Client,
   FMX.Controls.Presentation,
   FMX.StdCtrls,
   FMX.Objects,
@@ -96,10 +96,10 @@ var
 implementation
 
 uses
-  uMqtt,
   System.IOUtils,
   IdSSLOpenSSLHeaders,
-  IdSSLOpenSSL;
+  IdSSLOpenSSL,
+  MQTT.Types;
 
 {$R *.fmx}
 

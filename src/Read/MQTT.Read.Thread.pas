@@ -1,4 +1,4 @@
-unit MQTTReadThread;
+unit MQTT.Read.Thread;
 
 interface
 
@@ -13,11 +13,6 @@ uses
   MQTT.Headers.RecvState;
 
 type
-  TMQTTRecvUtilities = class
-  public
-    class function MSBLSBToInt(ALengthBytes: TBytes): integer;
-    class function RLBytesToInt(ARlBytes: TBytes): integer;
-  end;
 
   TUnparsedMsg = record
   public
@@ -28,7 +23,6 @@ type
 
   TMQTTReadThread = class(TThread)
   private
-    { Private declarations }
     FLink: TIdTCPClient;
     FCriticalSection: TCriticalSection;
     FCurrentMsg: TUnparsedMsg;
@@ -88,39 +82,8 @@ type
 implementation
 
 uses
-  MQTT.Headers.Types;
-
-class function TMQTTRecvUtilities.MSBLSBToInt(ALengthBytes: TBytes): integer;
-begin
-  Assert(ALengthBytes <> nil, 'O método não pode receber valor nulo');
-  Assert(Length(ALengthBytes) = 2, 'The MSB-LSB 2 bytes structure must be 2 Bytes in length');
-  Result := ALengthBytes[0] shl 8;
-  Result := Result + ALengthBytes[1];
-end;
-
-class function TMQTTRecvUtilities.RLBytesToInt(ARlBytes: TBytes): integer;
-var
-  lMulti: integer;
-  i: integer;
-  lDigit: Byte;
-begin
-  Assert(ARlBytes <> nil, 'O método não pode receber valor nulo');
-
-  lMulti := 1;
-  i := 0;
-  Result := 0;
-
-  if ((Length(ARlBytes) > 0) and (Length(ARlBytes) <= 4)) then
-  begin
-    lDigit := ARlBytes[i];
-    repeat
-      // lDigit := ARlBytes[i];
-      Result := Result + (lDigit and 127) * lMulti;
-      lMulti := lMulti * 128;
-      // Inc(i);
-    until ((lDigit and 128) = 0);
-  end;
-end;
+  MQTT.Headers.Types,
+  MQTT.Utils.Recv;
 
 procedure AppendBytes(var DestArray: TBytes; const NewBytes: TBytes);
 var
@@ -167,7 +130,7 @@ begin
         SynchronizeEvent(
           procedure
           begin
-            OnPubComp(Self, TMQTTRecvUtilities.MSBLSBToInt(FCurrentMsg.Data));
+            OnPubComp(Self, TMQTTRecvUtils.MSBLSBToInt(FCurrentMsg.Data));
           end);
     end;
   end;
@@ -182,7 +145,7 @@ begin
         SynchronizeEvent(
           procedure
           begin
-            OnPubAck(Self, TMQTTRecvUtilities.MSBLSBToInt(FCurrentMsg.Data));
+            OnPubAck(Self, TMQTTRecvUtils.MSBLSBToInt(FCurrentMsg.Data));
           end);
     end;
   end;
@@ -197,7 +160,7 @@ begin
         SynchronizeEvent(
           procedure
           begin
-            OnPubRel(Self, TMQTTRecvUtilities.MSBLSBToInt(FCurrentMsg.Data));
+            OnPubRel(Self, TMQTTRecvUtils.MSBLSBToInt(FCurrentMsg.Data));
           end);
 
     end;
@@ -213,7 +176,7 @@ begin
         SynchronizeEvent(
           procedure
           begin
-            OnPubRec(Self, TMQTTRecvUtilities.MSBLSBToInt(FCurrentMsg.Data));
+            OnPubRec(Self, TMQTTRecvUtils.MSBLSBToInt(FCurrentMsg.Data));
           end);
     end;
   end;
@@ -228,7 +191,7 @@ begin
         SynchronizeEvent(
           procedure
           begin
-            OnUnSubAck(Self, TMQTTRecvUtilities.MSBLSBToInt(FCurrentMsg.Data));
+            OnUnSubAck(Self, TMQTTRecvUtils.MSBLSBToInt(FCurrentMsg.Data));
           end);
     end;
   end;
@@ -270,7 +233,7 @@ begin
       SynchronizeEvent(
         procedure
         begin
-          OnSubAck(Self, TMQTTRecvUtilities.MSBLSBToInt(Copy(FCurrentMsg.Data, 0, 2)), lQrantedQoS);
+          OnSubAck(Self, TMQTTRecvUtils.MSBLSBToInt(Copy(FCurrentMsg.Data, 0, 2)), lQrantedQoS);
         end);
   end;
 end;
@@ -368,7 +331,7 @@ begin
 
                   if (lIndex = 4) or (lIndex = 5) then
                   begin
-                    lRLInt := TMQTTRecvUtilities.RLBytesToInt(lCurrentMessage.RL);
+                    lRLInt := TMQTTRecvUtils.RLBytesToInt(lCurrentMessage.RL);
                     if lRLInt > 0 then
                     begin
                       SetLength(lCurrentMessage.Data, lRLInt);
@@ -481,7 +444,7 @@ var AStringRead: string): integer;
 var
   lLength: integer;
 begin
-  lLength := TMQTTRecvUtilities.MSBLSBToInt(Copy(ADataStream, AIndexStartAt, 2));
+  lLength := TMQTTRecvUtils.MSBLSBToInt(Copy(ADataStream, AIndexStartAt, 2));
   if lLength > 0 then
   begin
     AStringRead := TEncoding.UTF8.GetString(ADataStream, AIndexStartAt + 2, lLength);

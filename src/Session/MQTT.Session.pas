@@ -1,10 +1,10 @@
-unit uMQTTSession;
+unit MQTT.Session;
 
 interface
 
 uses
-  uMQTTPacketStore,
-  uMQTTMessageStore;
+  MQTT.Packet.Store,
+  MQTT.Message.Store;
 
 type
   TMQTTSession = class

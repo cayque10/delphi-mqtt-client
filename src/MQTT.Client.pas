@@ -1,20 +1,21 @@
-﻿unit uMQTTComps;
+﻿unit MQTT.Client;
 
 interface
 
 uses
   Classes,
-  uMQTT,
   IdTCPClient,
   IdSSLOpenSSL,
-  MQTTReadThread,
+  MQTT.Read.Thread,
   System.SyncObjs,
   Fmx.Types,
-  uMQTTMessageStore,
-  uMQTTPacketStore,
+  MQTT.Message.Store,
+  MQTT.Packet.Store,
   System.Generics.Collections,
-  uMQTTSubscription,
-  MQTT.Events;
+  MQTT.Subscription,
+  MQTT.Events,
+  MQTT.Types,
+  MQTT.Parser;
 
 (* Web Sites
   http://www.alphaworks.ibm.com/tech/rsmb
@@ -41,9 +42,6 @@ uses
   BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL
   DAMAGES ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THE
   SPECIFICATION *)
-
-const
-  MinVersion = 3;
 
 const
   AllCurrentPlatforms = pidWin32 or pidAndroidArm32 or pidAndroidArm64;
@@ -122,6 +120,9 @@ type
     procedure ConfigureKeepAlive;
 
     procedure CheckConnection;
+
+    function SubTopics(ATopic: UTF8String): TStringList;
+    function IsSubscribed(ASubscription, ATopic: UTF8String): Boolean;
   public
     function Online: Boolean;
     function NextMessageID: Word;
@@ -174,73 +175,17 @@ type
   end;
 
 procedure Register;
-function SubTopics(ATopic: UTF8String): TStringList;
-function IsSubscribed(aSubscription, ATopic: UTF8String): Boolean;
 
 implementation
 
 uses
   SysUtils,
-  uMQTTPacket,
+  MQTT.Packet,
   MQTT.Headers.Types;
 
 procedure Register;
 begin
   RegisterComponents('MQTTClient', [TMQTTClient]);
-end;
-
-function SubTopics(ATopic: UTF8String): TStringList;
-var
-  i: integer;
-begin
-  result := TStringList.Create;
-  result.Add('');
-  for i := 1 to length(ATopic) do
-  begin
-    if ATopic[i] = '/' then
-      result.Add('')
-    else
-      result[result.Count - 1] := result[result.Count - 1] + Char(ATopic[i]);
-  end;
-end;
-
-function IsSubscribed(aSubscription, ATopic: UTF8String): Boolean;
-var
-  s, t: TStringList;
-  i: integer;
-  lMultiLevel: Boolean;
-begin
-  s := SubTopics(aSubscription);
-  try
-    t := SubTopics(ATopic);
-    try
-      lMultiLevel := (s[s.Count - 1] = '#'); // last field is #
-      if not lMultiLevel then
-        result := (s.Count = t.Count)
-      else
-        result := (s.Count <= t.Count + 1);
-      if result then
-      begin
-        for i := 0 to s.Count - 1 do
-        begin
-          if (i >= t.Count) then
-            result := lMultiLevel
-          else if (i = s.Count - 1) and (s[i] = '#') then
-            break
-          else if s[i] = '+' then
-            continue // they match
-          else
-            result := result and (s[i] = t[i]);
-          if not result then
-            break;
-        end;
-      end;
-    finally
-      t.Free;
-    end;
-  finally
-    s.Free;
-  end;
 end;
 
 procedure SetDup(aStream: TMemoryStream; aState: Boolean);
@@ -460,6 +405,21 @@ begin
   FParser.SendSubscribe(anID, ATopic, AQos);
 end;
 
+function TMQTTClient.SubTopics(ATopic: UTF8String): TStringList;
+var
+  i: integer;
+begin
+  result := TStringList.Create;
+  result.Add('');
+  for i := 1 to length(ATopic) do
+  begin
+    if ATopic[i] = '/' then
+      result.Add('')
+    else
+      result[result.Count - 1] := result[result.Count - 1] + Char(ATopic[i]);
+  end;
+end;
+
 procedure TMQTTClient.DoSend(Sender: TObject; anID: Word; aRetry: integer; aStream: TMemoryStream);
 var
   x: byte;
@@ -580,6 +540,45 @@ begin
     OnUnSubAck(Self, MessageID);
 end;
 
+function TMQTTClient.IsSubscribed(ASubscription, ATopic: UTF8String): Boolean;
+var
+  s, t: TStringList;
+  i: integer;
+  lMultiLevel: Boolean;
+begin
+  s := SubTopics(aSubscription);
+  try
+    t := SubTopics(ATopic);
+    try
+      lMultiLevel := (s[s.Count - 1] = '#'); // last field is #
+      if not lMultiLevel then
+        result := (s.Count = t.Count)
+      else
+        result := (s.Count <= t.Count + 1);
+      if result then
+      begin
+        for i := 0 to s.Count - 1 do
+        begin
+          if (i >= t.Count) then
+            result := lMultiLevel
+          else if (i = s.Count - 1) and (s[i] = '#') then
+            break
+          else if s[i] = '+' then
+            continue // they match
+          else
+            result := result and (s[i] = t[i]);
+          if not result then
+            break;
+        end;
+      end;
+    finally
+      t.Free;
+    end;
+  finally
+    s.Free;
+  end;
+end;
+
 procedure TMQTTClient.KeepAliveTimerEvent(Sender: TObject);
 begin
   if Online then
@@ -679,96 +678,6 @@ begin
   end;
   FParser.SendPublish(NextMessageID, ATopic, aMessage, AQos, false, aRetain);
 end;
-
-{ procedure TMQTTClient.TimerProc(var aMsg: TMessage);
-  var
-  i: integer;
-  bPacket: TMQTTPacket;
-  WillClose: Boolean;
-  begin
-  if aMsg.Msg = WM_TIMER then
-  begin
-  KillTimer(Timers, aMsg.WParam);
-  case aMsg.WParam of
-  1:
-  begin
-  Mon('Connecting to ' + Host + ' on Port ' + IntToStr(Port));
-  FLink.Host := Host;
-  FLink.Port := Port;
-  // FLink.Proto := 'tcp';
-  try
-  FLink.Connect;
-  if FLink.Connected then
-  FOnline := createAndResumeRecvThread(FLink);
-  except
-  raise;
-  end;
-  end;
-  2:
-  Ping;
-  3:
-  begin // send duplicates
-  for i := FInFlight.Count - 1 downto 0 do
-  begin
-  bPacket := FInFlight.List[i];
-  if bPacket.Counter > 0 then
-  begin
-  bPacket.Counter := bPacket.Counter - 1;
-  if bPacket.Counter = 0 then
-  begin
-  bPacket.Retries := bPacket.Retries + 1;
-  if bPacket.Retries <= MaxRetries then
-  begin
-  if bPacket.Publishing then
-  begin
-  FInFlight.List.Remove(bPacket);
-  Mon('Message ' + IntToStr(bPacket.ID) + ' disposed of..');
-  Mon('Re-issuing Message ' + IntToStr(bPacket.ID) + ' Retry ' + IntToStr(bPacket.Retries));
-  SetDup(bPacket.Msg, True);
-  DoSend(FParser, bPacket.ID, bPacket.Retries, bPacket.Msg);
-  bPacket.Free;
-  end
-  else
-  begin
-  Mon('Re-issuing PUBREL Message ' + IntToStr(bPacket.ID) + ' Retry ' + IntToStr(bPacket.Retries));
-  FParser.SendPubRel(bPacket.ID, True);
-  bPacket.Counter := FParser.RetryTime;
-  end;
-  end
-  else
-  begin
-  WillClose := True;
-  if Assigned(FOnFailure) then
-  FOnFailure(Self, frMAXRETRIES, WillClose);
-  if WillClose then
-  // Link.CloseDelayed;
-  end;
-  end;
-  end;
-  end;
-  SetTimer(Timers, 3, 100, nil);
-  end;
-  end;
-  end;
-  end; }
-
-{ procedure TMQTTClient.Unsubscribe(Topics: TStringList);
-  var
-  i, j: integer;
-  begin
-  if Topics = nil then
-  exit;
-  for i := 0 to Topics.Count - 1 do
-  begin
-  for j := Subscriptions.Count - 1 downto 0 do
-  if Subscriptions[j] = Topics[i] then
-  begin
-  Subscriptions.Delete(j);
-  break;
-  end;
-  end;
-  FParser.SendUnsubscribe(NextMessageID, Topics);
-  end; }
 
 procedure TMQTTClient.Unsubscribe(ATopic: UTF8String);
 var

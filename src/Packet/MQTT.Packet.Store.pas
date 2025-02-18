@@ -1,10 +1,10 @@
-unit uMQTTPacketStore;
+unit MQTT.Packet.Store;
 
 interface
 
 uses
   System.Generics.Collections,
-  uMQTTPacket,
+  MQTT.Packet,
   System.Classes;
 
 type

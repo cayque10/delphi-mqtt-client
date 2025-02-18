@@ -1,9 +1,9 @@
-unit uMQTTMessage;
+unit MQTT.Message;
 
 interface
 
 uses
-  uMQTT;
+  MQTT.Types;
 
 type
   TMQTTMessage = class

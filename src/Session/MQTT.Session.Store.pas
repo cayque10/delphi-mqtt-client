@@ -1,11 +1,11 @@
-unit uMQTTSessionStore;
+unit MQTT.Session.Store;
 
 interface
 
 uses
   System.Generics.Collections,
-  uMQTTSession,
-  uMQTTComps;
+  MQTT.Session,
+  MQTT.Client;
 
 type
   TMQTTSessionStore = class

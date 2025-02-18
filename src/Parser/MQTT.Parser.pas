@@ -1,4 +1,4 @@
-﻿unit uMQTT;
+﻿unit MQTT.Parser;
 (* Web Sites
   http://www.alphaworks.ibm.com/tech/rsmb
   http://www.mqtt.org
@@ -29,66 +29,21 @@ interface
 
 uses
   Classes,
-  MQTT.Headers.Types;
+  MQTT.Headers.Types,
+  MQTT.Types,
+  MQTT.Events;
 
 const
   MQTT_PROTOCOL = 'MQIsdp';
   MQTT_VERSION = 3;
 
-  DefRetryTime = 60; // 6 seconds
-  DefMaxRetries = 8;
+  DEF_RETRY_TIME = 60; // 6 seconds
+  DEF_MAX_RETRIES = 8;
 
-  rsHdr = 0;
-  rsLen = 1;
-  rsVarHdr = 2;
-  rsPayload = 3;
-
-  frKEEPALIVE = 0; // keep alive exceeded
-  frMAXRETRIES = 1;
-
-  rcACCEPTED = 0; // Connection Accepted
-  rcPROTOCOL = 1; // Connection Refused: unacceptable protocol version
-  rcIDENTIFIER = 2; // Connection Refused: identifier rejected
-  rcSERVER = 3; // Connection Refused: server unavailable
-  rcUSER = 4; // Connection Refused: bad user name or password
-  rcAUTHORISED = 5; // Connection Refused: not authorised
-  // 6-255 Reserved for future use
-
+  RS_HDR = 0;
+  RS_LEN = 1;
+  RS_VAR_HDR = 2;
 type
-
-  TMQTTQOSType = (qtAT_MOST_ONCE, // 0 At most once Fire and Forget        <=1
-    qtAT_LEAST_ONCE, // 1 At least once Acknowledged delivery >=1
-    qtEXACTLY_ONCE, // 2 Exactly once Assured delivery       =1
-    qtReserved3 // 3	Reserved
-    );
-
-  TMQTTStreamEvent = procedure(Sender: TObject; anID: Word; Retry: integer; aStream: TMemoryStream) of object;
-  TMQTTMonEvent = procedure(Sender: TObject; aStr: string) of object;
-  TMQTTCheckUserEvent = procedure(Sender: TObject; aUser, aPass: UTF8String; var Allowed: boolean) of object;
-  TMQTTPubResponseEvent = procedure(Sender: TObject; aMsg: TMQTTMessageType; anID: Word) of object;
-  TMQTTIDEvent = procedure(Sender: TObject; anID: Word) of object;
-  TMQTTAckEvent = procedure(Sender: TObject; aCode: Byte) of object;
-  TMQTTDisconnectEvent = procedure(Sender: TObject; Graceful: boolean) of object;
-  TMQTTSubscriptionEvent = procedure(Sender: TObject; aTopic: UTF8String; var RequestedQos: TMQTTQOSType) of object;
-  TMQTTSubscribeEvent = procedure(Sender: TObject; anID: Word; Topics: TStringList) of object;
-  TMQTTUnsubscribeEvent = procedure(Sender: TObject; anID: Word; Topics: TStringList) of object;
-  TMQTTSubAckEvent = procedure(Sender: TObject; anID: Word; Qoss: array of TMQTTQOSType) of object;
-  TMQTTFailureEvent = procedure(Sender: TObject; aReason: integer; var CloseClient: boolean) of object;
-  TMQTTMsgEvent = procedure(Sender: TObject; aTopic: UTF8String; aMessage: String; aQos: TMQTTQOSType;
-    aRetained: boolean) of object;
-  TMQTTRetainEvent = procedure(Sender: TObject; aTopic: UTF8String; aMessage: String; aQos: TMQTTQOSType) of object;
-  TMQTTRetainedEvent = procedure(Sender: TObject; Subscribed: UTF8String; var aTopic: UTF8String; var aMessage: String;
-    var aQos: TMQTTQOSType) of object;
-  TMQTTPublishEvent = procedure(Sender: TObject; anID: Word; aTopic: UTF8String; aMessage: String) of object;
-  TMQTTClientIDEvent = procedure(Sender: TObject; var aClientID: UTF8String) of object;
-  TMQTTConnectEvent = procedure(Sender: TObject; Protocol: UTF8String; Version: Byte;
-    ClientID, UserName, Password: UTF8String; KeepAlive: Word; Clean: boolean) of object;
-  TMQTTWillEvent = procedure(Sender: TObject; aTopic, aMessage: UTF8String; aQos: TMQTTQOSType; aRetain: boolean)
-    of object;
-  TMQTTObituaryEvent = procedure(Sender: TObject; var aTopic, aMessage: UTF8String; var aQos: TMQTTQOSType) of object;
-  TMQTTHeaderEvent = procedure(Sender: TObject; MsgType: TMQTTMessageType; Dup: boolean; Qos: TMQTTQOSType;
-    Retain: boolean) of object;
-  TMQTTSessionEvent = procedure(Sender: TObject; aClientID: UTF8String) of object;
 
   TMQTTParser = class
   private
@@ -130,6 +85,14 @@ type
     FClientID: UTF8String;
     FClean: boolean;
     procedure SetKeepAlive(const Value: Word);
+    procedure AddByte(aStream: TStream; aByte: Byte);
+    procedure AddHdr(aStream: TStream; MsgType: TMQTTMessageType; Dup: boolean; Qos: TMQTTQOSType; Retain: boolean);
+    procedure AddLength(aStream: TStream; aLen: integer);
+    procedure AddStr(aStream: TStream; aStr: UTF8String);
+    function ReadByte(aStream: TStream): Byte;
+    function ReadHdr(aStream: TStream; var MsgType: TMQTTMessageType; var Dup: boolean; var Qos: TMQTTQOSType;
+      var Retain: boolean): Byte;
+    function ReadStr(aStream: TStream): UTF8String;
   public
     constructor Create;
     destructor Destroy; override;
@@ -203,109 +166,20 @@ type
     property Clean: boolean read FClean write FClean;
   end;
 
-const
-  MsgNames: array [TMQTTMessageType] of string = (
-    // 'Reserved',	    //  0	Reserved
-    'BROKERCONNECT', // 0	Broker request to connect to Broker
-    'CONNECT', // 1	Client request to connect to Broker
-    'CONNACK', // 2	Connect Acknowledgment
-    'PUBLISH', // 3	Publish message
-    'PUBACK', // 4	Publish Acknowledgment
-    'PUBREC', // 5	Publish Received (assured delivery part 1)
-    'PUBREL', // 6	Publish Release (assured delivery part 2)
-    'PUBCOMP', // 7	Publish Complete (assured delivery part 3)
-    'SUBSCRIBE', // 8	Client Subscribe request
-    'SUBACK', // 9	Subscribe Acknowledgment
-    'UNSUBSCRIBE', // 10	Client Unsubscribe request
-    'UNSUBACK', // 11	Unsubscribe Acknowledgment
-    'PINGREQ', // 12	PING Request
-    'PINGRESP', // 13	PING Response
-    'DISCONNECT', // 14	Client is Disconnecting
-    'Reserved15' // 15
-    );
-
-  QOSNames: array [TMQTTQOSType] of string = ('AT_MOST_ONCE',
-    // 0 At most once Fire and Forget        <=1
-    'AT_LEAST_ONCE', // 1 At least once Acknowledged delivery >=1
-    'EXACTLY_ONCE', // 2 Exactly once Assured delivery       =1
-    'RESERVED' // 3	Reserved
-    );
-
-function CodeNames(aCode: Byte): string;
-function ExtractFileNameOnly(FileName: string): string;
-function FailureNames(aCode: Byte): string;
-procedure DebugStr(aStr: string);
-
 implementation
 
+{ TMQTTParser }
+
 uses
-  SysUtils
-{$IFDEF MSWINDOWS}
-    ,
-  Windows
-{$ENDIF}
-    ;
+  SysUtils;
 
-function ExtractFileNameOnly(FileName: string): string;
-begin
-  Result := ExtractFileName(FileName);
-  SetLength(Result, Length(Result) - Length(ExtractFileExt(FileName)));
-end;
-
-function CodeNames(aCode: Byte): string;
-begin
-  case (aCode) of
-    rcACCEPTED:
-      Result := 'ACCEPTED'; // Connection Accepted
-    rcPROTOCOL:
-      Result := 'PROTOCOL UNACCEPTABLE';
-    // Connection Refused: unacceptable protocol version
-    rcIDENTIFIER:
-      Result := 'IDENTIFIER REJECTED';
-    // Connection Refused: identifier rejected
-    rcSERVER:
-      Result := 'SERVER UNAVILABLE'; // Connection Refused: server unavailable
-    rcUSER:
-      Result := 'BAD LOGIN'; // Connection Refused: bad user name or FPassword
-    rcAUTHORISED:
-      Result := 'NOT AUTHORISED'
-  else
-    Result := 'RESERVED ' + IntToStr(aCode);
-  end;
-end;
-
-function FailureNames(aCode: Byte): string;
-begin
-  case (aCode) of
-    frKEEPALIVE:
-      Result := 'KEEP ALIVE TIMEOUT';
-    frMAXRETRIES:
-      Result := 'MAX RETRIES EXCEEDED';
-  else
-    Result := 'RESERVED ' + IntToStr(aCode);
-  end;
-end;
-
-procedure DebugStr(aStr: string);
-begin
-{$IFDEF MACOS}
-  Log.d(Text);
-{$ENDIF}
-{$IFDEF LINUX}
-  __write(stderr, aStr, Length(aStr));
-  __write(stderr, EOL, Length(EOL));
-{$ENDIF}
-{$IFDEF MSWINDOWS}
-  OutputDebugString(PChar(aStr));
-{$ENDIF}
-end;
-
-procedure AddByte(aStream: TStream; aByte: Byte);
+procedure TMQTTParser.AddByte(aStream: TStream; aByte: Byte);
 begin
   aStream.Write(aByte, 1);
 end;
 
-procedure AddHdr(aStream: TStream; MsgType: TMQTTMessageType; Dup: boolean; Qos: TMQTTQOSType; Retain: boolean);
+procedure TMQTTParser.AddHdr(aStream: TStream; MsgType: TMQTTMessageType; Dup: boolean; Qos: TMQTTQOSType;
+  Retain: boolean);
 begin
   { Fixed Header Spec:
     bit	   |7 6	5	4	    | |3	     | |2	1	     |  |  0   |
@@ -313,7 +187,7 @@ begin
   AddByte(aStream, (Ord(MsgType) shl 4) + (Ord(Dup) shl 3) + (Ord(Qos) shl 1) + Ord(Retain));
 end;
 
-procedure AddLength(aStream: TStream; aLen: integer);
+procedure TMQTTParser.AddLength(aStream: TStream; aLen: integer);
 var
   x: integer;
   dig: Byte;
@@ -328,7 +202,7 @@ begin
   until (x = 0);
 end;
 
-procedure AddStr(aStream: TStream; aStr: UTF8String);
+procedure TMQTTParser.AddStr(aStream: TStream; aStr: UTF8String);
 var
   l: integer;
 begin
@@ -338,7 +212,7 @@ begin
   aStream.Write(aStr[1], Length(aStr));
 end;
 
-function ReadByte(aStream: TStream): Byte;
+function TMQTTParser.ReadByte(aStream: TStream): Byte;
 begin
   if aStream.Position = aStream.Size then
     Result := 0
@@ -346,7 +220,7 @@ begin
     aStream.Read(Result, 1);
 end;
 
-function ReadHdr(aStream: TStream; var MsgType: TMQTTMessageType; var Dup: boolean; var Qos: TMQTTQOSType;
+function TMQTTParser.ReadHdr(aStream: TStream; var MsgType: TMQTTMessageType; var Dup: boolean; var Qos: TMQTTQOSType;
   var Retain: boolean): Byte;
 begin
   Result := ReadByte(aStream);
@@ -359,20 +233,7 @@ begin
   Retain := (Result and $01) > 0;
 end;
 
-function ReadLength(aStream: TStream): integer;
-var
-  mult: integer;
-  x: Byte;
-begin
-  mult := 0;
-  Result := 0;
-  repeat
-    x := ReadByte(aStream);
-    Result := Result + ((x and $7F) * mult);
-  until (x and $80) <> 0;
-end;
-
-function ReadStr(aStream: TStream): UTF8String;
+function TMQTTParser.ReadStr(aStream: TStream): UTF8String;
 var
   l: integer;
 begin
@@ -383,8 +244,6 @@ begin
     aStream.Read(Result[1], l);
   end;
 end;
-
-{ TMQTTParser }
 
 function TMQTTParser.CheckKeepAlive: boolean;
 begin
@@ -400,8 +259,8 @@ constructor TMQTTParser.Create;
 begin
   KeepAlive := 10;
   FKeepAliveCount := 0;
-  FMaxRetries := DefMaxRetries;
-  FRetryTime := DefRetryTime;
+  FMaxRetries := DEF_MAX_RETRIES;
+  FRetryTime := DEF_RETRY_TIME;
   FNosRetries := 0;
   FClientID := '';
   FWillTopic := '';
@@ -411,7 +270,7 @@ begin
   FWillRetain := false;
   FUserName := '';
   FPassword := '';
-  FRxState := rsHdr;
+  FRxState := RS_HDR;
   FRxMult := 0;
   FRxVal := 0;
   FRxMsg := mtReserved15;
@@ -448,7 +307,7 @@ end;
 
 procedure TMQTTParser.Reset;
 begin
-  FRxState := rsHdr;
+  FRxState := RS_HDR;
   FRxStream.Clear;
   FTxStream.Clear;
   FRxMsg := mtReserved15;
@@ -471,16 +330,16 @@ begin
   while aStream.Position <> aStream.Size do
   begin
     case FRxState of
-      rsHdr:
+      RS_HDR:
         begin
           ReadHdr(aStream, FRxMsg, FRxDup, FRxQos, FRxRetain);
-          FRxState := rsLen;
+          FRxState := RS_LEN;
           FRxMult := 1;
           FRxVal := 0;
           if Assigned(FOnHeader) then
             FOnHeader(Self, FRxMsg, FRxDup, FRxQos, FRxRetain);
         end;
-      rsLen:
+      RS_LEN:
         begin
           x := ReadByte(aStream);
           FRxVal := FRxVal + ((x and $7F) * FRxMult);
@@ -502,15 +361,15 @@ begin
                   if Assigned(FOnDisconnect) then
                     FOnDisconnect(Self);
               end;
-              FRxState := rsHdr;
+              FRxState := RS_HDR;
             end
             else
             begin
-              FRxState := rsVarHdr;
+              FRxState := RS_VAR_HDR;
             end;
           end;
         end;
-      rsVarHdr:
+      RS_VAR_HDR:
         begin
           x := ReadByte(aStream);
           FRxStream.Write(x, 1);
@@ -651,7 +510,7 @@ begin
                 end;
             end;
             FKeepAliveCount := KeepAlive * 10;
-            FRxState := rsHdr;
+            FRxState := RS_HDR;
           end;
         end;
     end;

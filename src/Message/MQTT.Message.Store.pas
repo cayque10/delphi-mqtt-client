@@ -1,11 +1,11 @@
-unit uMQTTMessageStore;
+unit MQTT.Message.Store;
 
 interface
 
 uses
   System.Generics.Collections,
-  uMQTTMessage,
-  uMQTT;
+  MQTT.Message,
+  MQTT.Types;
 
 type
 
