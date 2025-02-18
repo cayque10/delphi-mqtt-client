@@ -79,7 +79,7 @@ var
   lPacket: TMQTTPacket;
 begin
   for lPacket in FList do
-    lPacket.DisposeOf;
+    lPacket.Free;
 end;
 
 function TMQTTPacketStore.Count: integer;
@@ -104,7 +104,7 @@ begin
     if APacket.ID = AAnID then
     begin
       FList.Remove(APacket);
-      APacket.DisposeOf;
+      APacket.Free;
       exit;
     end;
   end;
@@ -113,7 +113,7 @@ end;
 destructor TMQTTPacketStore.Destroy;
 begin
   Clear;
-  FList.DisposeOf;
+  FList.Free;
   inherited;
 end;
 

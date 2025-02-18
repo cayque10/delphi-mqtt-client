@@ -74,7 +74,7 @@ var
   lMessage: TMQTTMessage;
 begin
   for lMessage in FList do
-    lMessage.DisposeOf;
+    lMessage.Free;
 end;
 
 function TMQTTMessageStore.Count: integer;
@@ -99,7 +99,7 @@ begin
     if AMsg.ID = AAnID then
     begin
       FList.Remove(AMsg);
-      AMsg.DisposeOf;
+      AMsg.Free;
       exit;
     end;
   end;
@@ -108,7 +108,7 @@ end;
 destructor TMQTTMessageStore.Destroy;
 begin
   Clear;
-  FList.DisposeOf;
+  FList.Free;
   inherited;
 end;
 

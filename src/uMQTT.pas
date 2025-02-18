@@ -1,4 +1,4 @@
-unit uMQTT;
+ï»¿unit uMQTT;
 (* Web Sites
   http://www.alphaworks.ibm.com/tech/rsmb
   http://www.mqtt.org
@@ -29,7 +29,7 @@ interface
 
 uses
   Classes,
-  MQTTHeaders;
+  MQTT.Headers.Types;
 
 const
   MQTT_PROTOCOL = 'MQIsdp';
@@ -424,8 +424,8 @@ end;
 
 destructor TMQTTParser.Destroy;
 begin
-  FTxStream.DisposeOf;
-  FRxStream.DisposeOf;
+  FTxStream.Free;
+  FRxStream.Free;
   inherited;
 end;
 
@@ -443,7 +443,7 @@ begin
   aStream.Write(aStr[1], Length(aStr));
   aStream.Seek(0, soFromBeginning);
   Parse(aStream);
-  aStream.DisposeOf;
+  aStream.Free;
 end;
 
 procedure TMQTTParser.Reset;
@@ -632,7 +632,7 @@ begin
                   end;
                   if Assigned(FOnUnsubscribe) then
                     FOnUnsubscribe(Self, id, Strs);
-                  Strs.DisposeOf;
+                  Strs.Free;
                 end;
               mtSUBSCRIBE:
                 if FRxStream.Size >= 2 then
@@ -647,7 +647,7 @@ begin
                   end;
                   if Assigned(FOnSubscribe) then
                     FOnSubscribe(Self, id, Strs);
-                  Strs.DisposeOf;
+                  Strs.Free;
                 end;
             end;
             FKeepAliveCount := KeepAlive * 10;
@@ -705,7 +705,7 @@ begin
   // payload
   s.Seek(0, soFromBeginning);
   FTxStream.CopyFrom(s, s.Size);
-  s.DisposeOf;
+  s.Free;
   if Assigned(FOnSend) then
     FOnSend(Self, 0, 0, FTxStream);
 end;
@@ -759,7 +759,7 @@ begin
     lMemory.Seek(0, soFromBeginning);
     FTxStream.CopyFrom(lMemory, lMemory.Size);
   finally
-    lMemory.DisposeOf;
+    lMemory.Free;
   end;
 
   if Assigned(FOnSend) then
@@ -781,7 +781,7 @@ procedure TMQTTParser.SendPublish(const anID: Word; const aTopic: UTF8String; co
   const aQos: TMQTTQOSType; const aDup: boolean = false; const aRetain: boolean = false);
 var
   lMemory: TMemoryStream;
-  MessageBytes: TBytes; // Nova variável para armazenar os bytes da mensagem
+  MessageBytes: TBytes; // Nova variï¿½vel para armazenar os bytes da mensagem
 begin
   FTxStream.Clear; // dup qos and retain used
   AddHdr(FTxStream, mtPUBLISH, aDup, aQos, aRetain);
@@ -806,7 +806,7 @@ begin
     AddLength(FTxStream, lMemory.Size);
     FTxStream.CopyFrom(lMemory, lMemory.Size);
   finally
-    lMemory.DisposeOf;
+    lMemory.Free;
   end;
 
   if Assigned(FOnSend) then
@@ -896,7 +896,7 @@ begin
     AddLength(FTxStream, lMemory.Size);
     FTxStream.CopyFrom(lMemory, lMemory.Size);
   finally
-    lMemory.DisposeOf;
+    lMemory.Free;
   end;
 
   if Assigned(FOnSend) then
@@ -923,7 +923,7 @@ begin
     AddLength(FTxStream, lMemory.Size);
     FTxStream.CopyFrom(lMemory, lMemory.Size);
   finally
-    lMemory.DisposeOf;
+    lMemory.Free;
   end;
 
   if Assigned(FOnSend) then

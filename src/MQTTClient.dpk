@@ -35,7 +35,7 @@ requires
   IndyCore;
 
 contains
-  MQTTHeaders in 'MQTTHeaders.pas',
+  MQTT.Headers.Message in 'Headers\MQTT.Headers.Message.pas',
   MQTTReadThread in 'MQTTReadThread.pas',
   uMQTT in 'uMQTT.pas',
   uMQTTComps in 'uMQTTComps.pas',
@@ -45,6 +45,20 @@ contains
   uMQTTSessionStore in 'uMQTTSessionStore.pas',
   uMQTTPacketStore in 'uMQTTPacketStore.pas',
   uMQTTMessageStore in 'uMQTTMessageStore.pas',
-  uMQTTSubscription in 'uMQTTSubscription.pas';
+  uMQTTSubscription in 'uMQTTSubscription.pas',
+  MQTT.Headers.Types in 'Headers\MQTT.Headers.Types.pas',
+  MQTT.Headers.RecvState in 'Headers\MQTT.Headers.RecvState.pas',
+  MQTT.Headers.Fixed in 'Headers\MQTT.Headers.Fixed.pas',
+  MQTT.Utils in 'Utils\MQTT.Utils.pas',
+  MQTT.Headers.ConnectFlags in 'Headers\MQTT.Headers.ConnectFlags.pas',
+  MQTT.Events in 'MQTT.Events.pas',
+  MQTT.Headers.Variable in 'Headers\MQTT.Headers.Variable.pas',
+  MQTT.Headers.ConnectVar in 'Headers\MQTT.Headers.ConnectVar.pas',
+  MQTT.Headers.PublishVar in 'Headers\MQTT.Headers.PublishVar.pas',
+  MQTT.Headers.SubscribeVar in 'Headers\MQTT.Headers.SubscribeVar.pas',
+  MQTT.Headers.UnsubscribeVar in 'Headers\MQTT.Headers.UnsubscribeVar.pas',
+  MQTT.Headers.Payload in 'Headers\MQTT.Headers.Payload.pas';
 
 end.
+
+

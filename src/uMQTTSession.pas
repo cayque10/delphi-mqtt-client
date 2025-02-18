@@ -39,9 +39,9 @@ end;
 
 destructor TMQTTSession.Destroy;
 begin
-  FInFlight.DisposeOf;
+  FInFlight.Free;
   //FReleasables.Clear;
-  FReleasables.DisposeOf;
+  FReleasables.Free;
   inherited;
 end;
 

@@ -40,7 +40,7 @@ var
   lSession: TMQTTSession;
 begin
   for lSession in FList do
-    lSession.DisposeOf;
+    lSession.Free;
 end;
 
 function TMQTTSessionStore.Count: integer;
@@ -62,14 +62,14 @@ begin
   if aSession <> nil then
   begin
     FList.Remove(aSession);
-    aSession.DisposeOf;
+    aSession.Free;
   end;
 end;
 
 destructor TMQTTSessionStore.Destroy;
 begin
   Clear;
-  FList.DisposeOf;
+  FList.Free;
   inherited;
 end;
 

@@ -9,7 +9,8 @@ uses
   SyncObjs,
   IdTCPClient,
   IdGlobal,
-  MQTTHeaders;
+  MQTT.Events,
+  MQTT.Headers.RecvState;
 
 type
   TMQTTRecvUtilities = class
@@ -85,6 +86,9 @@ type
   end;
 
 implementation
+
+uses
+  MQTT.Headers.Types;
 
 class function TMQTTRecvUtilities.MSBLSBToInt(ALengthBytes: TBytes): integer;
 begin

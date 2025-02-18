@@ -58,7 +58,7 @@ end;
 
 destructor TMQTTPacket.Destroy;
 begin
-  FMsg.DisposeOf;
+  FMsg.Free;
   inherited;
 end;
 

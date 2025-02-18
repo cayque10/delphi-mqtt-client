@@ -1,4 +1,4 @@
-unit uMQTTComps;
+ï»¿unit uMQTTComps;
 
 interface
 
@@ -7,14 +7,14 @@ uses
   uMQTT,
   IdTCPClient,
   IdSSLOpenSSL,
-  MQTTHeaders,
   MQTTReadThread,
   System.SyncObjs,
   Fmx.Types,
   uMQTTMessageStore,
   uMQTTPacketStore,
   System.Generics.Collections,
-  uMQTTSubscription;
+  uMQTTSubscription,
+  MQTT.Events;
 
 (* Web Sites
   http://www.alphaworks.ibm.com/tech/rsmb
@@ -91,8 +91,6 @@ type
     procedure OnConnected(Sender: TObject);
     procedure OnDisconnected(Sender: TObject);
 
-    // procedure TimerProc(var aMsg: TMessage);
-
     function GetClientID: UTF8String;
     procedure SetClientID(const Value: UTF8String);
     function GetKeepAlive: Word;
@@ -128,9 +126,7 @@ type
     function Online: Boolean;
     function NextMessageID: Word;
     procedure Subscribe(ATopic: UTF8String; AQos: TMQTTQOSType); overload;
-    // procedure Subscribe(const ATopics: TStringList); overload;
     procedure Unsubscribe(ATopic: UTF8String); overload;
-    // procedure Unsubscribe(Topics: TStringList); overload;
     procedure Ping;
     procedure Publish(ATopic: UTF8String; aMessage: String; AQos: TMQTTQOSType; aRetain: Boolean);
     procedure SetWill(ATopic, aMessage: UTF8String; AQos: TMQTTQOSType; aRetain: Boolean = false);
@@ -185,7 +181,8 @@ implementation
 
 uses
   SysUtils,
-  uMQTTPacket;
+  uMQTTPacket,
+  MQTT.Headers.Types;
 
 procedure Register;
 begin
@@ -239,10 +236,10 @@ begin
         end;
       end;
     finally
-      t.DisposeOf;
+      t.Free;
     end;
   finally
-    s.DisposeOf;
+    s.Free;
   end;
 end;
 
@@ -311,7 +308,7 @@ begin
   FIdHandlerSocket.SSLOptions.Mode := sslmClient;
   FIdHandlerSocket.SSLOptions.Method := sslvTLSv1_2;
   FIdHandlerSocket.PassThrough := false;
-  // TODO: pendente implementação
+  // TODO: pendente implementacao
   // LIdHandlerSocket.SSLOptions.CertFile := '';
   // LIdHandlerSocket.SSLOptions.KeyFile := '';
   // LIdHandlerSocket.SSLOptions.RootCertFile := '';
@@ -339,19 +336,19 @@ begin
   FKeepAliveTimer.Enabled := false;
   FinalizarRecThread;
   if Assigned(FRecvThread) then
-    FRecvThread.DisposeOf;
+    FRecvThread.Free;
   Disconnect;
-  FReleasables.DisposeOf;
-  FSubscriptions.DisposeOf;
-  FInFlight.DisposeOf;
-  FKeepAliveTimer.DisposeOf;
-  FParser.DisposeOf;
+  FReleasables.Free;
+  FSubscriptions.Free;
+  FInFlight.Free;
+  FKeepAliveTimer.Free;
+  FParser.Free;
 
   if Assigned(FLink) then
-    FLink.DisposeOf;
+    FLink.Free;
 
   if Assigned(FCriticalSection) then
-    FCriticalSection.DisposeOf;
+    FCriticalSection.Free;
   inherited;
 end;
 
@@ -429,41 +426,6 @@ procedure TMQTTClient.SetWill(ATopic, aMessage: UTF8String; AQos: TMQTTQOSType; 
 begin
   FParser.SetWill(ATopic, aMessage, AQos, aRetain);
 end;
-
-{ procedure TMQTTClient.Subscribe(const ATopics: TStringList);
-  var
-  j: integer;
-  i, x: cardinal;
-  lAnID: Word;
-  lFound: Boolean;
-  begin
-  if ATopics = nil then
-  exit;
-
-  lAnID := NextMessageID;
-  for i := 0 to ATopics.Count - 1 do
-  begin
-  lFound := false;
-  // 255 denotes acked
-  if i > 254 then
-  x := (cardinal(ATopics.Objects[i]) and $03)
-  else
-  x := (cardinal(ATopics.Objects[i]) and $03) + (lAnID shl 16) + (i shl 8);
-
-  for j := 0 to FSubscriptions.Count - 1 do
-  if FSubscriptions[j] = ATopics[i] then
-  begin
-  lFound := True;
-  FSubscriptions.Objects[j] := TObject(x);
-  break;
-  end;
-
-  if not lFound then
-  FSubscriptions.AddObject(ATopics[i], TObject(x));
-  end;
-
-  FParser.SendSubscribe(lAnID, ATopics);
-  end; }
 
 procedure TMQTTClient.Subscribe(ATopic: UTF8String; AQos: TMQTTQOSType);
 var
